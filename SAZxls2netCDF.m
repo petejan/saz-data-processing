@@ -3,7 +3,7 @@
 deployment_data = readtable('deployment-data.csv');
 
 % read the xlsx data
-data_file = '2018_saz20_47_sed_CWE_ver4.xlsx';
+data_file = '2012_saz15_47_sed_CWE_ver4';
 data = readtable(data_file, 'Sheet', 'netcdf_format');
 
 deployment = data.deploymentYearStart(3);
@@ -71,6 +71,7 @@ netcdf.putAtt(ncid, glob_att, 'deployment_number', '6');
 netcdf.putAtt(ncid, glob_att, 'disclaimer', 'Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose.');
 netcdf.putAtt(ncid, glob_att, 'distribution_statement', 'Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged\nData, products and services from IMOS are provided as is without any warranty as to fitness for a particular purpose.');
 netcdf.putAtt(ncid, glob_att, 'file_version', 'Level 1 - Quality Controlled Data');
+netcdf.putAtt(ncid, glob_att, 'featureType', 'timeSeries');
 netcdf.putAtt(ncid, glob_att, 'geospatial_lat_max', str2double(this_deployment.cmdddlatitude));
 netcdf.putAtt(ncid, glob_att, 'geospatial_lat_min', str2double(this_deployment.cmdddlatitude));
 netcdf.putAtt(ncid, glob_att, 'geospatial_lat_units', 'degrees_north');
@@ -167,9 +168,11 @@ str_dimID = netcdf.defDim(ncid, 'strlen', size(traps_u, 2));
 
 instrument_index_id = netcdf.defVar(ncid, 'instrument_index', 'byte', time_dimID);
 netcdf.putAtt(ncid, instrument_index_id, 'long_name', 'which instrument this obs is for');
+netcdf.putAtt(ncid, instrument_index_id, 'instance_dimension', 'instrument');
 
 instrument_type_id = netcdf.defVar(ncid, 'instrument_type', 'char', [str_dimID, instance_dimID]);
 netcdf.putAtt(ncid, instrument_type_id, 'long_name', 'deployment ; source instrument make ; model ; serial_number');
+netcdf.putAtt(ncid, instrument_type_id, 'cf_role', 'timeseries_id');
 
 nomial_depth_id = netcdf.defVar(ncid, 'NOMINAL_DEPTH', 'double', instance_dimID);
 netcdf.putAtt(ncid, nomial_depth_id, 'axis', 'Z');
