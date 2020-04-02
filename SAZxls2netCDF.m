@@ -138,7 +138,7 @@ netcdf.putAtt(ncid, time_id, 'ancillary_variables', 'TIME_bnds');
 bnds_dimID = netcdf.defDim(ncid, 'bnds', 2);
 
 % time bounds
-time_bnds_id = netcdf.defVar(ncid, 'TIME_bnds', 'double', [time_dimID bnds_dimID]);
+time_bnds_id = netcdf.defVar(ncid, 'TIME_bnds', 'double', [bnds_dimID time_dimID]);
 netcdf.putAtt(ncid, time_bnds_id, 'name', 'time open, closed');
 netcdf.putAtt(ncid, time_bnds_id, 'long_name', 'time sample open, closed');
 netcdf.putAtt(ncid, time_bnds_id, 'units', 'days since 1950-01-01T00:00:00 UTC');
