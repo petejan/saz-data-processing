@@ -3,7 +3,7 @@
 deployment_data = readtable('deployment-data.csv');
 
 % read the xlsx data
-data_file = '2012_saz15_47_sed_CWE_ver4';
+data_file = '2012_saz15_47_sed_CWE_ver5.xls';
 data = readtable(data_file, 'Sheet', 'netcdf_format');
 
 deployment = data.deploymentYearStart(3);
@@ -44,78 +44,50 @@ depth_nominal = str2double(data.depth_nominal(sample_msk));
 depths = data.depth_nominal(sample_msk);
 [depths_unique, depths_u_idx, m] = unique(depths);
 traps = data.trap(sample_msk);
-traps_u = cell2mat(traps(depths_u_idx));
+traps_max_len = max(cellfun(@(x) size(x,2), traps(depths_u_idx), 'UniformOutput', true));
+traps_u = cell2mat(pad(traps(depths_u_idx)));
 
 % add global attributes:
 glob_att = netcdf.getConstant('NC_GLOBAL');
+global_attrs = readtable('global_attribute_table.xlsx');
 
-%netcdf.putAtt(ncid, glob_att, 'abstract', 'Sediment traps (IMOS platform code:SAZOTS) are cones which intercept and store falling marine particles in collection cups.\nThe particles consist of a range of material including phytoplankton, zooplankton, faecal pellets, and dust. Each trap collects a time series of samples.\nThe sediment traps are from deep moorings in the Southern Ocean, typically at 47S, 54S, and 61S and at around 140 degrees East.\nEach mooring typically has 2-3 traps between 800m and 3800m below sea-level.');
-netcdf.putAtt(ncid, glob_att, 'abstract', 'Oceanographic and meteorological data from the Southern Ocean Time Series observatory in the Southern Ocean southwest of Tasmania.');
+now_char = char(datetime('now','TimeZone','UTC+0','Format','y-MM-dd HH:mm:ss'));
 
-netcdf.putAtt(ncid, glob_att, 'acknowledgement', 'Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: \"Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government.\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in credit in the metadata record).');
-netcdf.putAtt(ncid, glob_att, 'author', 'Peter Jansen');
-netcdf.putAtt(ncid, glob_att, 'author_email', 'peter.jansen@csiro.au');
-netcdf.putAtt(ncid, glob_att, 'cdm_data_type', 'Station');
-netcdf.putAtt(ncid, glob_att, 'citation', 'Integrated Marine Observing System. [year-of-data-download], [Title], [Data access URL], accessed [date- of-access]');
+% add variable (this file specific) attributes
+var_names = {'deployment', 'name', 'type', 'value'};
+glob_all = [global_attrs; cell2table({deployment, 'history', 'STRING', [now_char ' : created from ' data_file]}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'date_created', 'STRING', now_char}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_max', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_min', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_max', 'DOUBLE', str2double(this_deployment.cmdddlongitude)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_min', 'DOUBLE', str2double(this_deployment.cmdddlongitude)}, 'VariableNames', var_names)];
 
-netcdf.putAtt(ncid, glob_att, 'comment_archive', 'zooplankton > 1mm archived, photos avaliable on request, 3/10 of sample archived');
-netcdf.putAtt(ncid, glob_att, 'comment_instrument', 'trap area, paraflux = 0.5 m^2, IRS = 0.16 m^2');
-netcdf.putAtt(ncid, glob_att, 'comment_time', 'time is sample mid point');
+glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_max', 'DOUBLE', max(depth_nominal)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_min', 'DOUBLE', min(depth_nominal)}, 'VariableNames', var_names)];
 
-netcdf.putAtt(ncid, glob_att, 'Conventions', 'CF-1.6,IMOS-1.4');
-netcdf.putAtt(ncid, glob_att, 'data_centre', 'Australian Ocean Data Network (AODN)');
-netcdf.putAtt(ncid, glob_att, 'data_centre_email', 'info@aodn.org.au');
-netcdf.putAtt(ncid, glob_att, 'data_mode', 'D');
-netcdf.putAtt(ncid, glob_att, 'deployment_code', this_deployment.cmdddname{1});
-netcdf.putAtt(ncid, glob_att, 'deployment_number', '6');
-netcdf.putAtt(ncid, glob_att, 'disclaimer', 'Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose.');
-netcdf.putAtt(ncid, glob_att, 'distribution_statement', 'Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged\nData, products and services from IMOS are provided as is without any warranty as to fitness for a particular purpose.');
-netcdf.putAtt(ncid, glob_att, 'file_version', 'Level 1 - Quality Controlled Data');
-netcdf.putAtt(ncid, glob_att, 'featureType', 'timeSeries');
-netcdf.putAtt(ncid, glob_att, 'geospatial_lat_max', str2double(this_deployment.cmdddlatitude));
-netcdf.putAtt(ncid, glob_att, 'geospatial_lat_min', str2double(this_deployment.cmdddlatitude));
-netcdf.putAtt(ncid, glob_att, 'geospatial_lat_units', 'degrees_north');
-netcdf.putAtt(ncid, glob_att, 'geospatial_lon_max', str2double(this_deployment.cmdddlongitude));
-netcdf.putAtt(ncid, glob_att, 'geospatial_lon_min', str2double(this_deployment.cmdddlongitude));
-netcdf.putAtt(ncid, glob_att, 'geospatial_lon_units', 'degrees_east');
-netcdf.putAtt(ncid, glob_att, 'geospatial_vertical_max', max(depth_nominal));
-netcdf.putAtt(ncid, glob_att, 'geospatial_vertical_min', min(depth_nominal));
-netcdf.putAtt(ncid, glob_att, 'geospatial_vertical_positive', 'down');
-netcdf.putAtt(ncid, glob_att, 'geospatial_vertical_units', 'metres');
-netcdf.putAtt(ncid, glob_att, 'institution', 'CSIRO; Antarctic Climate & Ecosystem Cooperative Research Centre');
-netcdf.putAtt(ncid, glob_att, 'institution_address', 'CSIRO Marine Laboratories, Castray Esp, Hobart, Tasmania 7001, Australia; 20 Castray Esplanade, Hobart Tasmania 7000, Australia');
+glob_all = [glob_all; cell2table({deployment, 'instrument_serial_number', 'STRING', strjoin(traps(depths_u_idx), ' ; ')}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'time_coverage_start', 'STRING', datestr(min(mid_times), time_fmt)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'time_coverage_end', 'STRING', datestr(max(mid_times), time_fmt)}, 'VariableNames', var_names)];
 
-netcdf.putAtt(ncid, glob_att, 'instrument', 'McLane-PARFLUX Mark78H-21');
-netcdf.putAtt(ncid, glob_att, 'instrument_serial_number', strjoin(traps(depths_u_idx), ' ; '));
-netcdf.putAtt(ncid, glob_att, 'keywords', 'Oceans->Ocean Chemistry->Biogeochemical Cycles; moles_of_nitrate_and_nitrite_per_unit_mass_in_sea_water; moles_of_phosphate_per_unit_mass_in_sea_water; sea water parctical salinity; sample_number; moles_of_silicate_per_unit_mass_in_sea_water; moles_of_inorganic_carbon_per_unit_mass_in_sea_water; sea water temperature; recovered_bag_contents_mass');
+glob_all = [glob_all; cell2table({deployment, 'time_deployment_start', 'STRING', datestr(this_deployment.cmddddeploymentdate(1), time_fmt)}, 'VariableNames', var_names)];
+glob_all = [glob_all; cell2table({deployment, 'time_deployment_end', 'STRING', datestr(this_deployment.cmdddrecoverydate(1), time_fmt)}, 'VariableNames', var_names)];
 
-netcdf.putAtt(ncid, glob_att, 'license', 'http://creativecommons.org/licenses/by/4.0/');
-netcdf.putAtt(ncid, glob_att, 'Metadata_Conventions', 'Unidata Dataset Discovery v1.0');
-netcdf.putAtt(ncid, glob_att, 'Mooring', 'SAZ mooring');
-netcdf.putAtt(ncid, glob_att, 'naming_authority', 'IMOS');
-netcdf.putAtt(ncid, glob_att, 'platform_code', 'SAZ');
-netcdf.putAtt(ncid, glob_att, 'principal_investigator', 'Tom Trull');
-netcdf.putAtt(ncid, glob_att, 'principal_investigator_email', 'tom.trull@csiro.au');
-netcdf.putAtt(ncid, glob_att, 'project', 'Integrated Marine Observing System (IMOS)');
-netcdf.putAtt(ncid, glob_att, 'quality_control_set', '2');
-netcdf.putAtt(ncid, glob_att, 'references', 'http://www.imos.org.au');
-netcdf.putAtt(ncid, glob_att, 'site_code', 'SOTS');
-netcdf.putAtt(ncid, glob_att, 'source', 'Moorings');
-netcdf.putAtt(ncid, glob_att, 'standard_name_vocabulary', 'NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 67');
+glob_all = [glob_all; cell2table({deployment, 'deployment_code', 'STRING', this_deployment.cmdddname{1}}, 'VariableNames', var_names)];
 
-netcdf.putAtt(ncid, glob_att, 'time_coverage_start', datestr(min(mid_times), time_fmt));
-netcdf.putAtt(ncid, glob_att, 'time_coverage_end', datestr(max(mid_times), time_fmt));
-netcdf.putAtt(ncid, glob_att, 'time_deployment_start', datestr(this_deployment.cmddddeploymentdate(1), time_fmt));
-netcdf.putAtt(ncid, glob_att, 'time_deployment_end', datestr(this_deployment.cmdddrecoverydate(1), time_fmt));
+[a, gl_idx] = sort(lower(glob_all.name));
 
-netcdf.putAtt(ncid, glob_att, 'title', 'Oceanographic and meteorological data from the Southern Ocean Time Series observatory in the Southern Ocean southwest of Tasmania.');
-netcdf.putAtt(ncid, glob_att, 'uncertainty', '+/- 95% ci');
-netcdf.putAtt(ncid, glob_att, 'voyage_deployment', 'http://www.cmar.csiro.au/data/trawler/survey_details.cfm?survey=SS2009_V04');
-netcdf.putAtt(ncid, glob_att, 'voyage_recovery', 'http://www.cmar.csiro.au/data/trawler/survey_details.cfm?survey=SS2010_V02');
-
-now_char = char(datetime('now','TimeZone','UTC+0','Format','y-MM-d HH:mm:ss'));
-netcdf.putAtt(ncid, glob_att, 'history', [now_char ' : created from ' data_file]);
-netcdf.putAtt(ncid, glob_att, 'date_created', now_char);
+for j = 1:size(gl_idx, 1)
+    i = gl_idx(j);
+    add_this = false;
+    if strcmp(glob_all.deployment{i}, '*')
+        add_this = true;
+    elseif strcmp(glob_all.deployment{i}, deployment)
+        add_this = true;
+    end
+    %if strcmp(glob_all.type{i}, 'STRING')
+        netcdf.putAtt(ncid, glob_att, glob_all.name{i}, glob_all.value{i});
+    %end
+end
 
 % add the OBS dimension, this allows the three traps to be in the one file
 time_dimID = netcdf.defDim(ncid, 'OBS', len_time);
