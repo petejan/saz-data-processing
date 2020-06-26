@@ -44,11 +44,7 @@ for didx = 1:size(d_u,1)
 
 
     % create the netCDF file for this depth
-    % file name
-    % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
-    fn = ['IMOS_DWM-SOTS_KF_' datestr(min(mid_times), 'yyyymmdd') '_SAZ47_FV01_' deployment{1} '_PARFLUX-Mark78H-21-' num2str(d) 'm_END-' datestr(min(mid_times), 'yyyymmdd') '_C-' datestr(datetime(), 'yyyymmdd') '.nc'];
-    ncid = netcdf.create(fn, cmode);
-
+   
     [B, I] = sort(mid_times);
 
     % trap serial numbers
@@ -62,15 +58,11 @@ for didx = 1:size(d_u,1)
     global_attrs = readtable('global_attribute_table.xlsx');
    % take the string only up to the first space of the "trap" column in the
    % Excel file
-    inst = extractBefore(traps_u, " ");
+    inst_split = strsplit(traps_u, ";");
      % add in the actual instrument type (for the rare cases where it is a
     % IRS trap)
-    if inst =="IRS"
-        global_attrs.value(global_attrs.name == "instrument") = {inst};
-    else 
-        global_attrs.value(global_attrs.name == "instrument") = global_attrs.value(global_attrs.name == "instrument");
-    end
-
+    global_attrs.value(global_attrs.name == "instrument") =  {inst_split{1}};
+    
     % filter out non deployment lines
     globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment),:);
     % replace any \n with newline
@@ -91,18 +83,23 @@ for didx = 1:size(d_u,1)
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_max', 'DOUBLE', max(depth_nominal)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_min', 'DOUBLE', min(depth_nominal)}, 'VariableNames', var_names)];
 
-    glob_all = [glob_all; cell2table({deployment, 'instrument_serial_number', 'STRING', strjoin(traps(depths_u_idx), ' ; ')}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'instrument_serial_number', 'STRING', inst_split{2}}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'time_coverage_start', 'STRING', datestr(min(mid_times), time_fmt)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'time_coverage_end', 'STRING', datestr(max(mid_times), time_fmt)}, 'VariableNames', var_names)];
 
+    %%%
     glob_all = [glob_all; cell2table({deployment, 'time_deployment_start', 'STRING', datestr(this_deployment.cmddddeploymentdate(1), time_fmt)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'time_deployment_end', 'STRING', datestr(this_deployment.cmdddrecoverydate(1), time_fmt)}, 'VariableNames', var_names)];
 
     glob_all = [glob_all; cell2table({deployment, 'deployment_code', 'STRING', this_deployment.cmdddname{1}}, 'VariableNames', var_names)];
 
     % instrument info
-    glob_all = [glob_all; cell2table({deployment, 'instrument_type', 'STRING', traps_u'}, 'VariableNames', var_names)];
+    %glob_all = [glob_all; cell2table({deployment, 'instrument_type', 'STRING', traps_u'}, 'VariableNames', var_names)];
 
+    % file name
+    % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
+    fn = ['IMOS_DWM-SOTS_KF_' datestr(min(mid_times), 'yyyymmdd') '_SAZ' char(extractBetween(deployment,'SAZ','-')) '_FV01_' deployment{1} '_' inst_split{1} '_' num2str(d) 'm_END-' datestr(max(mid_times), 'yyyymmdd') '_C-' datestr(datetime(), 'yyyymmdd') '.nc'];
+    ncid = netcdf.create(fn, cmode);
     
     [a, gl_idx] = sort(lower(glob_all.name));
 
