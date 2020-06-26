@@ -60,6 +60,17 @@ for didx = 1:size(d_u,1)
     % add global attributes:
     glob_att = netcdf.getConstant('NC_GLOBAL');
     global_attrs = readtable('global_attribute_table.xlsx');
+   % take the string only up to the first space of the "trap" column in the
+   % Excel file
+    inst = extractBefore(traps_u, " ");
+     % add in the actual instrument type (for the rare cases where it is a
+    % IRS trap)
+    if inst =="IRS"
+        global_attrs.value(global_attrs.name == "instrument") = {inst};
+    else 
+        global_attrs.value(global_attrs.name == "instrument") = global_attrs.value(global_attrs.name == "instrument");
+    end
+
     % filter out non deployment lines
     globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment),:);
     % replace any \n with newline
