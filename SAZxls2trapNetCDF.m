@@ -65,15 +65,18 @@ for didx = 1:size(d_u,1)
     now_char = char(datetime('now','TimeZone','UTC+0','Format','y-MM-dd HH:mm:ss'));
     now_char_nc = char(datetime('now','TimeZone','UTC+0','Format','y-MM-dd''T''HH:mm:ss''Z'''));
 
+    lat = this_deployment.cmdddlatitude;
+    lon = this_deployment.cmdddlongitude;
+ 
     % add variable (this file specific) attributes
     var_names = {'deployment', 'name', 'type', 'value'};
     glob_all = [globs; cell2table({deployment, 'history', 'STRING', [now_char ' : created from ' data_file]}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'date_created', 'STRING', now_char_nc}, 'VariableNames', var_names)];
     % geospatial indo
-    glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_max', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
-    glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_min', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
-    glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_max', 'DOUBLE', str2double(this_deployment.cmdddlongitude)}, 'VariableNames', var_names)];
-    glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_min', 'DOUBLE', str2double(this_deployment.cmdddlongitude)}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_max', 'DOUBLE', lat}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_min', 'DOUBLE', lat}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_max', 'DOUBLE', lon}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_min', 'DOUBLE', lon}, 'VariableNames', var_names)];
 
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_max', 'DOUBLE', max(depth_nominal)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_min', 'DOUBLE', min(depth_nominal)}, 'VariableNames', var_names)];
@@ -99,12 +102,13 @@ for didx = 1:size(d_u,1)
     glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
 
     % build the file name
-    % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
+    % example IMOS_ABOS-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
     start_time = datestr(min(mid_times), 'yyyymmdd');
     end_time = datestr(max(mid_times), 'yyyymmdd');
     create_time = datestr(datetime(), 'yyyymmdd');
     mooring = regexp(deployment{1}, '[^-]*', 'match', 'once');
-    fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '_' inst '_' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
+    %fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '_' inst '_' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
+    fn = ['IMOS_ABOS-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '_' inst '_' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
     ncid = netcdf.create(fn, cmode);
     
     % sort the attributes
@@ -328,8 +332,8 @@ for didx = 1:size(d_u,1)
     % nominal_depth
     netcdf.putVar(ncid, nomial_depth_id, d);
     % latitude, longitude
-    netcdf.putVar(ncid, lat_id, str2double(this_deployment.cmdddlatitude));
-    netcdf.putVar(ncid, lon_id, str2double(this_deployment.cmdddlongitude));
+    netcdf.putVar(ncid, lat_id, lat);
+    netcdf.putVar(ncid, lon_id, lon);
 
     % copy data variables
     next_qc = 0;     
