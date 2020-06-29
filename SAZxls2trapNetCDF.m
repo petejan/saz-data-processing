@@ -3,7 +3,7 @@
 deployment_data = readtable('deployment-data.csv');
 
 % read the xlsx data
-data_file = '2017_saz19_46_sed_PJ_ver6.xlsx';
+data_file = '2012_saz15_47_sed_CWE_ver7.xls';
 data = readtable(data_file, 'Sheet', 'netcdf_format');
 
 deployment = data.deploymentYearStart(3);
@@ -57,11 +57,6 @@ for didx = 1:size(d_u,1)
     glob_att = netcdf.getConstant('NC_GLOBAL');
     global_attrs = readtable('global_attribute_table.xlsx');
     
-    % take the string only up to the first ; of the "trap" column in the Excel file
-    inst = strsplit(traps_u, ';');
-    global_attrs.value(global_attrs.name == "instrument") = strtrim(inst(1));
-    global_attrs.value(global_attrs.name == "instrument_serial_number") = strtrim(inst(2));
-    
     % filter out non deployment lines
     globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment),:);
     % replace any \n with newline
@@ -74,6 +69,7 @@ for didx = 1:size(d_u,1)
     var_names = {'deployment', 'name', 'type', 'value'};
     glob_all = [globs; cell2table({deployment, 'history', 'STRING', [now_char ' : created from ' data_file]}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'date_created', 'STRING', now_char_nc}, 'VariableNames', var_names)];
+    % geospatial indo
     glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_max', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_min', 'DOUBLE', str2double(this_deployment.cmdddlatitude)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_max', 'DOUBLE', str2double(this_deployment.cmdddlongitude)}, 'VariableNames', var_names)];
@@ -82,27 +78,39 @@ for didx = 1:size(d_u,1)
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_max', 'DOUBLE', max(depth_nominal)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'geospatial_vertical_min', 'DOUBLE', min(depth_nominal)}, 'VariableNames', var_names)];
 
-    glob_all = [glob_all; cell2table({deployment, 'instrument_serial_number', 'STRING', strjoin(traps(depths_u_idx), ' ; ')}, 'VariableNames', var_names)];
+    % time coverage
     glob_all = [glob_all; cell2table({deployment, 'time_coverage_start', 'STRING', datestr(min(mid_times), time_fmt)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'time_coverage_end', 'STRING', datestr(max(mid_times), time_fmt)}, 'VariableNames', var_names)];
-    glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
-
-    %
+    % deployment times
     glob_all = [glob_all; cell2table({deployment, 'time_deployment_start', 'STRING', datestr(this_deployment.cmddddeploymentdate(1), time_fmt)}, 'VariableNames', var_names)];
     glob_all = [glob_all; cell2table({deployment, 'time_deployment_end', 'STRING', datestr(this_deployment.cmdddrecoverydate(1), time_fmt)}, 'VariableNames', var_names)];
 
     glob_all = [glob_all; cell2table({deployment, 'deployment_code', 'STRING', this_deployment.cmdddname{1}}, 'VariableNames', var_names)];
 
-    % instrument info
-    glob_all = [glob_all; cell2table({deployment, 'instrument_type', 'STRING', traps_u'}, 'VariableNames', var_names)];
+    % instrument info, comes from trap column, split by ; eg <inst> ; <serial number>
+    % take the string only up to the first ; of the "trap" column in the Excel file
+    inst_split = strsplit(traps_u, ';');
+    inst = strtrim(inst_split{1});
+    sn = strtrim(inst_split{2});
 
-    % file name
+    glob_all = [glob_all; cell2table({deployment, 'instrument', 'STRING', inst}, 'VariableNames', var_names)];
+    glob_all = [glob_all; cell2table({deployment, 'instrument_serial_number', 'STRING', sn}, 'VariableNames', var_names)];
+
+    glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
+
+    % build the file name
     % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
-    fn = ['IMOS_DWM-SOTS_KF_' datestr(min(mid_times), 'yyyymmdd') '_SAZ' char(extractBetween(deployment,'SAZ','-')) '_FV01_' deployment{1} '_' strtrim(inst{1}) '_' num2str(d) 'm_END-' datestr(max(mid_times), 'yyyymmdd') '_C-' datestr(datetime(), 'yyyymmdd') '.nc'];
+    start_time = datestr(min(mid_times), 'yyyymmdd');
+    end_time = datestr(max(mid_times), 'yyyymmdd');
+    create_time = datestr(datetime(), 'yyyymmdd');
+    mooring = regexp(deployment{1}, '[^-]*', 'match', 'once');
+    fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '_' inst '_' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
     ncid = netcdf.create(fn, cmode);
     
+    % sort the attributes
     [a, gl_idx] = sort(lower(glob_all.name));
 
+    % copy all attributes into the netCDF file
     for j = 1:size(gl_idx, 1)
         i = gl_idx(j);
         add_this = false;
@@ -116,7 +124,7 @@ for didx = 1:size(d_u,1)
         %end
     end
 
-    % add the OBS dimension, this allows the three traps to be in the one file
+    % add the TIME dimension
     time_dimID = netcdf.defDim(ncid, 'TIME', len_time);
 
     %
@@ -146,21 +154,6 @@ for didx = 1:size(d_u,1)
     netcdf.putAtt(ncid, time_bnds_id, 'valid_min', 10957);
     netcdf.putAtt(ncid, time_bnds_id, 'valid_max', 54787.);
     netcdf.putAtt(ncid, time_bnds_id, 'calendar', 'gregorian');
-
-    %         byte instrument_index(OBS) ;
-    %                 instrument_index:long_name = "which instrument this obs is for" ;
-    %                 instrument_index:instance_dimension = "instrument" ;
-    %         char instrument_type(instrument, strlen) ;
-    %                 instrument_type:long_name = "deployment ; source instrument make ; model ; serial_number" ;
-    %         double NOMINAL_DEPTH(instrument) ;
-    %                 NOMINAL_DEPTH:axis = "Z" ;
-    %                 NOMINAL_DEPTH:long_name = "nominal depth" ;
-    %                 NOMINAL_DEPTH:positive = "down" ;
-    %                 NOMINAL_DEPTH:reference_datum = "sea surface" ;
-    %                 NOMINAL_DEPTH:standard_name = "depth" ;
-    %                 NOMINAL_DEPTH:units = "m" ;
-    %                 NOMINAL_DEPTH:valid_max = 12000.f ;
-    %                 NOMINAL_DEPTH:valid_min = -5.f ;
 
     nomial_depth_id = netcdf.defVar(ncid, 'NOMINAL_DEPTH', 'double', []);
     netcdf.putAtt(ncid, nomial_depth_id, 'axis', 'Z');
