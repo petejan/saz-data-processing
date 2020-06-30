@@ -3,7 +3,7 @@
 deployment_data = readtable('deployment-data.csv');
 
 % read the xlsx data
-data_file = '2012_saz15_47_sed_CWE_ver7.xls';
+data_file = '2018_saz20_47_sed.xlsx';
 data = readtable(data_file, 'Sheet', 'netcdf_format');
 
 deployment = data.deploymentYearStart(3);
