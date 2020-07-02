@@ -3,7 +3,7 @@
 deployment_data = readtable('deployment-data.csv');
 
 % read the xlsx data
-data_file = '2018_saz20_47_sed.xlsx';
+data_file = '2012_saz15_47_sed_CWE_ver7.xls';
 data = readtable(data_file, 'Sheet', 'netcdf_format');
 
 deployment = data.deploymentYearStart(3);
@@ -226,6 +226,7 @@ for didx = 1:size(d_u,1)
 
             % save name for if next variable is a QC variable
             vn = var_name{1};
+			ln = vn
 
             % add metadata
             for i = 1:size(data.metadata,1)
@@ -238,6 +239,9 @@ for didx = 1:size(d_u,1)
                                 metadata_value = single(str2double(metadata_value));
                             end
                             netcdf.putAtt(ncid, varid, data.metadata{i}, metadata_value);
+							if (strcmp(data.metadata{i}, 'long_name'))
+								ln = metadata_value;
+							end
                         end
                     end
                 end
@@ -256,9 +260,8 @@ for didx = 1:size(d_u,1)
                 varid_qc = netcdf.defVar(ncid, [vn '_quality_control'], 'byte', time_dimID);
                 netcdf.defVarFill(ncid, varid_qc, false, 127);
 
-                netcdf.putAtt(ncid, varid_qc, 'long_name', ['quality flag for ' vn]);
+                netcdf.putAtt(ncid, varid_qc, 'long_name', ['quality flag for ' ln]);
                 netcdf.putAtt(ncid, varid_qc, 'quality_control_conventions', 'IMOS standard flags');
-                netcdf.putAtt(ncid, varid_qc, 'quality_control_set', 1);
                 netcdf.putAtt(ncid, varid_qc, 'valid_min', int8(0)) ;
                 netcdf.putAtt(ncid, varid_qc, 'valid_max', int8(9));
                 netcdf.putAtt(ncid, varid_qc, 'flag_values', int8([0, 1, 2, 3, 4, 9]));
@@ -290,7 +293,7 @@ for didx = 1:size(d_u,1)
                     end
                 end
 
-                netcdf.putAtt(ncid, varid_qc, 'long_name', ['uncertainty for ' vn]);
+                netcdf.putAtt(ncid, varid_qc, 'long_name', ['uncertainty for ' ln]);
 
                 % need to add default QC data to variables
 
