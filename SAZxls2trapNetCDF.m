@@ -1,5 +1,5 @@
 
-data_files{1} = '2008_saz11_45_sed_CWE_ver4.xls';
+data_files{1} = '1998_saz2_sed_CWE_ver4.xls';
 %data_files{2} = '2011-2012/2011_saz14_47_sed_CWE_ver4.xls';
 
 for i = 1:size(data_files,2)
@@ -199,7 +199,7 @@ function gen_trap_netcdf(data_file)
         netcdf.putAtt(ncid, lon_id, 'coordinate_reference_frame', 'urn:ogc:crs:EPSG::4326') ;
 
         % loop through variables, and create them in netCDF, creating the quality_control variables also
-        use_vars = [4 13:size(data.Properties.VariableNames,2)]; % TODO: find the start of variable names, 13 is a bit of a hack
+        use_vars = [4 7 13:size(data.Properties.VariableNames,2)]; % TODO: find the start of variable names, 13 is a bit of a hack
 
         var_ids = [];
         var_n = 1;
