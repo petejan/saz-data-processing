@@ -1,8 +1,24 @@
+% Script to generate SAZ netCDF files from xlsx spread sheet data files
 
-data_files{1} = '1998_saz2_sed_CWE_ver4.xls';
-%data_files{2} = '2011-2012/2011_saz14_47_sed_CWE_ver4.xls';
+data_files{1}  = '1997-1998/1997_saz1_sed_CWE_ver4.xls';
+data_files{2}  = '1998_saz2_sed_CWE_ver4.xls';
+data_files{3}  = '1999_saz3_sed_PJ_ver5.xls';
+data_files{4}  = '2000-2001/2000_saz4_sed_CWE_ver4.xls';
+data_files{5}  = '2003-2004/2003_saz7_sed_CWE_ver4.xls';
+data_files{6}  = '2005-2006/2005_saz9_sed_CWE_ver4.xls';
+data_files{7}  = '2008-2009/2008_saz11_45_sed_CWE_ver4.xls';
+data_files{8}  = '2009-2010/2009_saz12_47_sed_CWE_ver4.xls';
+data_files{9}  = '2010-2011/2010_saz13_47_sed_CWE_ver4.xls';
+data_files{10} = '2011-2012/2011_saz14_47_sed_CWE_ver4.xls';
+data_files{11} = '2012_2013/2012_saz15_47_sed_CWE_ver7.xls';
+data_files{12} = '2013-2015/2013_saz16_47_sed_CWE_ver5.xls';
+data_files{13} = '2015-2016/2015_saz17_47_sed_CWE_2019_ver5.xls';
+data_files{14} = '2016-2017/2016_saz18_47_sed_CWE_ver6.xlsx';
+data_files{15} = '2018-2019/2018_saz20_47_sed_CWE_ver9.xlsx';
 
-for i = 1:size(data_files,2)
+
+%for i = 1:size(data_files,2)
+for i = 3
     gen_trap_netcdf(data_files{i});
 end
 
