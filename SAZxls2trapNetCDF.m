@@ -17,8 +17,8 @@ data_files{14}  = 'raw_data/2016_saz18_47_sed_CWE_ver7.xlsx';
 data_files{15}  = 'raw_data/2017_saz19_46_sed_CWE_ver8.xlsx';
 data_files{16}  = 'raw_data/2018_saz20_47_sed_PJ_ver10.xlsx';
 
-%for i = 1:size(data_files,2)
-for i = 1
+for i = 1:size(data_files,2)
+%for i = 1
     gen_trap_netcdf(data_files{i});
 end
 
@@ -128,13 +128,13 @@ function gen_trap_netcdf(data_file)
         glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
 
         % build the file name
-        % example IMOS_ABOS-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
+        % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
         start_time = datestr(min(mid_times), 'yyyymmdd');
         end_time = datestr(max(mid_times), 'yyyymmdd');
         create_time = datestr(datetime(), 'yyyymmdd');
         mooring = regexp(deployment{1}, '[^-]*', 'match', 'once');
         %fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '-' inst '-' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
-        fn = ['IMOS_ABOS-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '-' inst '-' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
+        fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '-' inst '-' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
         ncid = netcdf.create(fn, cmode);
 
         % sort the attributes
