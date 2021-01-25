@@ -1,25 +1,25 @@
 % Script to generate SAZ netCDF files from xlsx spread sheet data files
 
-data_files{1}  = '1997-1998/1997_saz1_sed_CWE_ver5.xls';
-%data_files{2}  = '1998-1999/1998_saz2_sed_CWE_ver5.xls';
-%data_files{3}  = '1999-2000/1999_saz3_sed_CWE_ver5.xls';
-%data_files{4}  = '2000-2001/2000_saz4_sed_CWE_ver5.xls';
-%data_files{5}  = '2003-2004/2003_saz7_sed_CWE_ver5.xls';
-%data_files{6}  = '2005-2006/2005_saz9_sed_CWE_ver5.xls';
-%data_files{7}  = '2008-2009/2008_saz11_45_sed_CWE_ver5.xls';
-%data_files{8}  = '2009-2010/2009_saz12_47_sed_CWE_ver5.xls';
-%data_files{9}  = '2010-2011/2010_saz13_47_sed_CWE_ver5.xls';
-%data_files{10} = '2011-2012/2011_saz14_47_sed_CWE_ver5.xls';
-%data_files{11} = '2012-2013/2012_saz15_47_sed_CWE_ver8.xls';
-%data_files{12} = '2013-2015/2013_saz16_47_sed_CWE_ver6.xls';
-%data_files{13} = '2015-2016/2015_saz17_47_sed_CWE_2019_ver6.xls';
-%data_files{14} = '2016-2017/2016_saz18_47_sed_CWE_ver7.xlsx';
-%data_files{15} = '2017-2018/2017_saz19_46_sed_CWE_ver8.xlsx';
-%data_files{16} = '2018-2019/2018_saz20_47_sed_PJ_ver10.xlsx';
+clear data_files
 
+data_files{1}  = 'raw_data/1997_saz1_sed.xls';
+data_files{2}  = 'raw_data/1998_saz2_sed.xls';
+data_files{3}  = 'raw_data/1999_saz3_sed.xls';
+data_files{4}  = 'raw_data/2000_saz4_sed.xls';
+data_files{5}  = 'raw_data/2003_saz7_sed.xls';
+data_files{6}  = 'raw_data/2005_saz9_sed.xls';
+data_files{7}  = 'raw_data/2008_saz11_45_sed.xls';
+data_files{8}  = 'raw_data/2009_saz12_47_sed.xls';
+data_files{9}  = 'raw_data/2010_saz13_47_sed.xls';
+data_files{10}  = 'raw_data/2011_saz14_47_sed.xls';
+data_files{11}  = 'raw_data/2012_saz15_47_sed.xls';
+data_files{12}  = 'raw_data/2013_saz16_47_sed.xls';
+data_files{13}  = 'raw_data/2015_saz17_47_sed.xls';
+data_files{14}  = 'raw_data/2016_saz18_47_sed.xlsx';
+data_files{15}  = 'raw_data/2017_saz19_46_sed.xlsx';
+data_files{16}  = 'raw_data/2018_saz20_47_sed.xlsx';
 
 for i = 1:size(data_files,2)
-%for i = 1
     gen_trap_netcdf(data_files{i});
 end
 
@@ -28,11 +28,18 @@ function gen_trap_netcdf(data_file)
 
     f = dir(data_file);
     
+    disp(data_file)
+    
     % read the deployment information
     deployment_data = readtable('deployment-data.csv');
 
     % read the xlsx data
-    data = readtable(data_file, 'Sheet', 'netcdf_format');
+    opts = detectImportOptions(data_file, 'Sheet', 'netcdf_format');
+    opts = setvartype(opts,opts.VariableNames,'char');
+    opts = setvartype(opts,{'metadata_depth'},'double');
+    opts.DataRange = 'A2';
+    
+    data = readtable(data_file, opts, 'Sheet', 'netcdf_format');
 
     deployment = data.deploymentYearStart(3);
     dep_info_size = ~cellfun(@isempty,strfind(deployment_data.cmdddname, deployment));
@@ -44,7 +51,7 @@ function gen_trap_netcdf(data_file)
     cmode = bitor(cmode, netcdf.getConstant('CLASSIC_MODEL'));
 
     % get the number of samples
-    sample_msk_all = ~isnan(data.sample_qc);
+    sample_msk_all = ~isnan(str2double(data.sample_qc));
 
     % get metedata rows
     metadata_msk = ~cellfun(@isempty, data.metadata);
@@ -61,7 +68,7 @@ function gen_trap_netcdf(data_file)
         d = d_u(didx);
         disp(d)
 
-        sample_msk = ~isnan(data.sample_qc) & str2double(data.depth_nominal) == d;
+        sample_msk = sample_msk_all & (str2double(data.depth_nominal) == d);
         depth_nominal = str2double(data.depth_nominal(sample_msk));
 
         len_time = sum(sample_msk);
@@ -70,7 +77,6 @@ function gen_trap_netcdf(data_file)
         mid_times = datetime(data.sampleMid_point(sample_msk));
         open_times = datetime(data.sampleOpen(sample_msk));
         close_times = datetime(data.sampleClose(sample_msk));
-
 
         % create the netCDF file for this depth
 
@@ -99,10 +105,12 @@ function gen_trap_netcdf(data_file)
 
         % add variable (this file specific) attributes
         var_names = {'deployment', 'name', 'type', 'value'};
+        
         history = [now_char ' : created from : ' f.name ' datestamp : ' char(datetime(f.datenum, 'ConvertFrom', 'datenum', 'Format', 'yyyy-MM-dd HH:mm:ss'))];
         glob_all = [globs; cell2table({deployment, 'history', 'STRING', history}, 'VariableNames', var_names)];
         glob_all = [glob_all; cell2table({deployment, 'date_created', 'STRING', now_char_nc}, 'VariableNames', var_names)];
-        % geospatial indo
+
+        % geospatial info
         glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_max', 'DOUBLE', lat}, 'VariableNames', var_names)];
         glob_all = [glob_all; cell2table({deployment, 'geospatial_lat_min', 'DOUBLE', lat}, 'VariableNames', var_names)];
         glob_all = [glob_all; cell2table({deployment, 'geospatial_lon_max', 'DOUBLE', lon}, 'VariableNames', var_names)];
@@ -132,13 +140,13 @@ function gen_trap_netcdf(data_file)
         glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
 
         % build the file name
-        % example IMOS_ABOS-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
+        % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
+        
         start_time = datestr(min(mid_times), 'yyyymmdd');
         end_time = datestr(max(mid_times), 'yyyymmdd');
         create_time = datestr(datetime(), 'yyyymmdd');
         mooring = regexp(deployment{1}, '[^-]*', 'match', 'once');
         fn = ['IMOS_DWM-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '-' inst '-' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
-        %fn = ['IMOS_ABOS-SOTS_KF_' start_time '_' mooring '_FV01_' deployment{1} '-' inst '-' num2str(d) 'm_END-' end_time '_C-' create_time '.nc'];
         ncid = netcdf.create([f.folder '/' fn], cmode);
 
         % sort the attributes
