@@ -93,7 +93,7 @@ function gen_trap_netcdf(data_file)
         global_attrs = readtable('global_attribute_table.xlsx');
 
         % filter out non deployment lines
-        globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment),:);
+        globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment) | ~strcmp('', global_attrs.value),:);
         % replace any \n with newline
         globs{:,'value'} = strrep(globs{:, 'value'}, '\n', ['.' newline]);
 
