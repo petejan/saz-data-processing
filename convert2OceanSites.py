@@ -6,6 +6,7 @@ import re
 import numpy
 import glob
 import os
+import sys
 
 # IMOS file format conversion to OceanSITES format
 # Pete Jansen and Cathryn Wynn-Edwards 2021-01-11
@@ -50,21 +51,12 @@ def sort_attributes(outputname):
 #print(curr_dir)
 #path = curr_dir
 
-nc_files = glob.glob('raw_data/IMOS*.nc', recursive=True)
+#print("input file %s" % sys.argv[1:])
 
+nc_files = []
+for f in sys.argv[1:]:
+    nc_files.extend(glob.glob(f, recursive=True))
 
-# split this into   createCatalog - copy needed information into structure
-#                   createTimeArray (1D, OBS) - from list of structures
-#                   createNewFile
-#                   copyAttributes
-#                   updateAttributes
-#                   copyData
-
-#
-# createCatalog - copy needed information into structure
-#
-
-#print("input file %s" % path_file)
 
 for fn in nc_files:
 
@@ -118,7 +110,7 @@ for fn in nc_files:
 
     fileTimeFormat = "%Y%m%d"
     ncTimeFormat = "%Y-%m-%dT%H:%M:%SZ"
-    sensor = fileProductTypeSplit[3]
+    sensor = fileProductTypeSplit[4]
     nominal_depth = fileProductTypeSplit[-1]
     original_file_creation_date = splitParts[-1].split(".")
 
@@ -187,7 +179,7 @@ for fn in nc_files:
     # create the OceanSITES global attributes
     ncOut.setncattr("time_coverage_start", dates[0].strftime(ncTimeFormat))
     ncOut.setncattr("time_coverage_end", dates[-1].strftime(ncTimeFormat))
-    ncOut.setncattr("date_created", datetime.utcnow().strftime(ncTimeFormat))
+    ncOut.setncattr("date_update", datetime.utcnow().strftime(ncTimeFormat))
     ncOut.setncattr("acknowledgement", "We acknowledge support from the following agencies: the Australian Antarctic Program Partnership (AAPP), the Antarctic Climate and Ecosystems Cooperative Research Centre (ACE CRC), the Integrated Marine Observing System (www.imos.org.au), University of Tasmania (UTAS), Bureau of Meteorology (BoM), the Marine National Facility (MNF) and the Australian Antarctic Division (AAD). We also acknowledge the support of the CSIRO Moored Sensor Systems team.")
     ncOut.setncattr("data_type", "OceanSITES time-series data")
     ncOut.setncattr("format_version", "1.3")
