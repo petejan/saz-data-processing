@@ -5,7 +5,7 @@ clear data_files
 %data_files{1}  = 'raw_data/1997_saz1_sed.xls';
 %data_files{2}  = 'raw_data/1998_saz2_sed.xls';
 %data_files{3}  = 'raw_data/1999_saz3_sed.xls';
-%data_files{4}  = 'raw_data/2000_saz4_sed.xls';
+data_files{4}  = 'raw_data/2000_saz4_sed.xls';
 %data_files{5}  = 'raw_data/2003_saz7_sed.xls';
 %data_files{6}  = 'raw_data/2005_saz9_sed.xls';
 %data_files{7}  = 'raw_data/2008_saz11_45_sed.xls';
@@ -18,14 +18,14 @@ clear data_files
 %data_files{14}  = 'raw_data/2016_saz18_47_sed.xlsx';
 %data_files{15}  = 'raw_data/2017_saz19_46_sed.xlsx';
 %data_files{16}  = 'raw_data/2018_saz20_47_sed.xlsx';
-data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
+%data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
 
 
 %for i = 1:size(data_files,2)
  %   gen_trap_netcdf(data_files{i});
 %end
 
-for i = 17
+for i = 4
     gen_trap_netcdf(data_files{i});
 end
 
