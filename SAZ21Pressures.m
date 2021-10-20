@@ -34,8 +34,9 @@ for fn = files
     end
     time = ncread(file, 'TIME') + datetime(1950,1,1);
     instrument = ncreadatt(file, '/', 'instrument');
+    
     msk = time > datetime_start & time < datetime_end;
-        
+      
     mn = mean(pres(msk));
     md = mode(pres(msk));
     
