@@ -26,9 +26,7 @@ for i = 1:length(files)
     deployment_code_spl = strsplit(ncreadatt(fn,'/','deployment_code'),'-');
     deployment_year = deployment_code_spl{3};
     varmsk = var;
-    if varQC>2
-        isnan(varmsk)
-    end
+    varmsk(varQC>2)=NaN;
           
     for t = 1:21
         data(end+1,m(t))=varmsk(t);
@@ -36,7 +34,7 @@ for i = 1:length(files)
 end
 data(data==0) = NaN;
 
-figure()
+figure(5)
 boxchart(data)
 xlabel('Month')
 label=join(strsplit(plotVar,'_'), ' ');
