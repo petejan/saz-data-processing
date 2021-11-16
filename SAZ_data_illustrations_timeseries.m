@@ -1,4 +1,4 @@
-% illustrating SAZ data month by month
+% illustrating SAZ data as a timeseries
 
 path = 'C:\Users\cawynn\OneDrive - University of Tasmania\Documents\GitHub\saz-data-processing\netCDF\trap data';
 cd(path)
@@ -21,20 +21,25 @@ for i = 1:length(files)
     varQCname = strsplit(ncreadatt(fn, plotVar, 'ancillary_variables'), ' ');
     varQC = ncread(fn, varQCname{2});
     time = ncread(fn, 'TIME') + datetime(1950,1,1); 
+    depth = ncread(fn,'NOMINAL_DEPTH');
     m = month(time);
     deployment_code_spl = strsplit(ncreadatt(fn,'/','deployment_code'),'-');
     deployment_year = deployment_code_spl{3};
     varmsk = var;
     varmsk(varQC>2)=NaN;
-          
-    for t = 1:21
-        data(end+1,m(t))=varmsk(t);
+    
+    if depth < 1050
+        plot(time,varmsk,'bo','DisplayName','1000m')
+        hold on
+    elseif depth >1050 && depth <2050
+        plot(time,varmsk, 'r*','DisplayName','2000m')
+        hold on
+    elseif depth >2050
+        plot(time,varmsk, 'k+','DisplayName','3800m')
     end
-end
-data(data==0) = NaN;
+    label=join(strsplit(plotVar,'_'), ' ');
+    ylabel([label '-' var_unit])
+    xlabel('Time')
+    legend('1000m','2000m','3800m')               
 
-figure(5)
-boxchart(data)
-xlabel('Month')
-label=join(strsplit(plotVar,'_'), ' ');
-ylabel([label '-' var_unit])
+end

@@ -1,14 +1,14 @@
 
 % 'C:\Users\cawynn\cloudstor\Shared\SAZ'
 
-	clear files
+clear files
 search_path = 'C:\Users\cawynn\OneDrive - University of Tasmania\Documents\GitHub\saz-data-processing\netCDF';
 cd(search_path)
     
-	files{1} = 'IMOS_DWM-SOTS_CPT_20190312_SAZ47_FV00_SAZ47-21-2019-SBE37-SM-4906-1000m_END-20200905_C-20210513.nc';
-	files{2} = 'IMOS_DWM-SOTS_CPT_20190312_SAZ47_FV00_SAZ47-21-2019-SBE37-SM-4907-2000m_END-20200905_C-20210513.nc';
-    files{3} = 'IMOS_DWM-SOTS_PT_20190312_SAZ47_FV00_SAZ47-21-2019-TDR-2050-016371-3800m_END-20200601_C-20210513.nc';
-    files{4} = 'netCDF/IMOS_DWM-SOTS_AETVZ_20190320_SAZ47_FV01_SAZ47-21-2019-Aquadopp-Current-Meter-1200_END-20200903_C-20201112.nc';
+	%files{1} = 'IMOS_DWM-SOTS_CPT_20190312_SAZ47_FV00_SAZ47-21-2019-SBE37-SM-4906-1000m_END-20200905_C-20210513.nc';
+	files{1} = 'IMOS_DWM-SOTS_CPT_20200829_SAZ47_FV00_SAZ47-22-2020-SBE37-SM-3124-2000m_END-20210426_C-20210513.nc';
+    files{2} = 'IMOS_DWM-SOTS_PT_20200815_SAZ47_FV00_SAZ47-22-2020-TDR-2050-016370-3800m_END-20210517_C-20210517.nc';
+    files{3} = 'IMOS_DWM-SOTS_AEPV_20200815_SAZ47_FV00_SAZ47-22-2020-Aquadopp-2-MHz-AQD-9820-1200m_END-20210428_C-20210513.nc';
 
 dep_start = ncreadatt(files{1}, '/', 'time_deployment_start');
 dep_end = ncreadatt(files{1}, '/', 'time_deployment_end');
