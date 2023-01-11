@@ -1,6 +1,9 @@
 % Script to generate SAZ netCDF files from xlsx spread sheet data files
+
+
 clear all
 clear data_files
+
 
 %data_files{1}  = 'raw_data/1997_saz1_sed.xls';
 %data_files{2}  = 'raw_data/1998_saz2_sed.xls';
@@ -19,11 +22,13 @@ clear data_files
 %data_files{15}  = 'raw_data/2017_saz19_46_sed.xlsx';
 %data_files{16}  = 'raw_data/2018_saz20_47_sed.xlsx';
 %data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
-data_files{1}  ='raw_data/2020_saz22_47_sed_ver1.xlsx';
-
-%for i = 1:size(data_files,2)
- %   gen_trap_netcdf(data_files{i});
-%end
+% data_files{1}  ='raw_data/2013_saz16_47_sed_CWE_ver7.xls';
+% data_file  ='raw_data/2015_saz17_47_sed_CWE_2019_ver7.xls';
+data_files{1} ='raw_data/2021_saz23_47_sed_ver1.xlsx';
+% 
+% for i = 1:size(data_files,2)
+%    gen_trap_netcdf(data_files{i});
+% end
 
 for i = 1
     gen_trap_netcdf(data_files{i});
@@ -99,8 +104,10 @@ function gen_trap_netcdf(data_file)
         global_attrs = readtable('global_attribute_table.xlsx');
 
         % filter out non deployment lines
-        globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment) | ~strcmp('', global_attrs.value),:);
-        % replace any \n with newline
+%         globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment) | ~strcmp('', global_attrs.value),:);
+        globs = global_attrs(strcmp('*',global_attrs.deployment) | strcmp(deployment, global_attrs.deployment),:);
+        
+%         % replace any \n with newline
         globs{:,'value'} = strrep(globs{:, 'value'}, '\n', ['.' newline]);
 
         now_char = char(datetime('now','TimeZone','UTC+0','Format','y-MM-dd HH:mm:ss'));

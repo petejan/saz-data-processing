@@ -3,7 +3,7 @@
 %file = 'data/IMOS_ABOS-ASFS_EVZ_20150322T001500Z_SOFS_FV01_SOFS-5-2015-Sea-Guard-200_END-20160420T041501Z_C-20161023T042146Z.nc';
 %file = 'data/IMOS_ABOS-ASFS_EVZ_20150322T001500Z_SOFS_FV01_SOFS-5-2015-Sea-Guard-800_END-20160420T040000Z_C-20161023T042334Z.nc';
 
-file = 'netCDF/IMOS_DWM-SOTS_AETVZ_20190320_SAZ47_FV01_SAZ47-21-2019-Aquadopp-Current-Meter-1200_END-20200903_C-20201112.nc';
+file = 'netCDF/IMOS_DWM-SOTS_AETVZ_20210424_SAZ47_FV01_SAZ47-23-2021-Aquadopp-Current-Meter-AQD-9897-1200m_END-_C-20220530.nc';
 
 %file = 'IMOS_DWM-SOTS_AETVZ_20180303_SAZ47_FV01_SAZ47-20-2018-Aquadopp-Current-Meter-AQD-5961-1200m_END-20190322_C-20190719.nc';
 
@@ -58,7 +58,7 @@ ylabel('current (m/s)');
 figures = findall(0,'type','figure'); 
 for f = 1:numel(figures)
       fig = figures(f);
-      filename = sprintf('SAZ47-20-current-1200m-Figures.ps');
+      filename = sprintf('SAZ47-23-current-1200m-Figures.ps');
       print( fig, '-dpsc2', filename, '-append');
 end
 
