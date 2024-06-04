@@ -24,7 +24,8 @@ clear data_files
 %data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
 % data_files{1}  ='raw_data/2013_saz16_47_sed_CWE_ver7.xls';
 % data_file  ='raw_data/2015_saz17_47_sed_CWE_2019_ver7.xls';
-data_files{1} ='raw_data/2021_saz23_47_sed_ver1.xlsx';
+%data_files{1} ='raw_data/2021_saz23_47_sed_ver1.xlsx';
+data_files{1}  = 'raw_data/2016_saz18_47_sed.xlsx';
 % 
 % for i = 1:size(data_files,2)
 %    gen_trap_netcdf(data_files{i});
@@ -85,9 +86,9 @@ function gen_trap_netcdf(data_file)
         len_time = sum(sample_msk);
 
         % get the sample timestamp
-        mid_times = datetime(data.sampleMid_point(sample_msk));
-        open_times = datetime(data.sampleOpen(sample_msk));
-        close_times = datetime(data.sampleClose(sample_msk));
+        mid_times = datetime(data.sampleMid_point(sample_msk), "Locale","en_AU");
+        open_times = datetime(data.sampleOpen(sample_msk), "Locale","en_AU");
+        close_times = datetime(data.sampleClose(sample_msk), "Locale","en_AU");
 
         % create the netCDF file for this depth
 
