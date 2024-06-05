@@ -24,8 +24,11 @@ clear data_files
 %data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
 % data_files{1}  ='raw_data/2013_saz16_47_sed_CWE_ver7.xls';
 % data_file  ='raw_data/2015_saz17_47_sed_CWE_2019_ver7.xls';
+%<<<<<<< Updated upstream
 %data_files{1} ='raw_data/2021_saz23_47_sed_ver1.xlsx';
-data_files{1}  = 'raw_data/2016_saz18_47_sed.xlsx';
+%data_files{1}  = 'raw_data/2016_saz18_47_sed.xlsx';
+%=======
+data_files{1} ='raw_data/2016_saz18_47_sed_CWE_ver8.xlsx';
 % 
 % for i = 1:size(data_files,2)
 %    gen_trap_netcdf(data_files{i});
