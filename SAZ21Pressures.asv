@@ -2,18 +2,18 @@
 % 'C:\Users\cawynn\cloudstor\Shared\SAZ'
 
 clear files
-% search_path = 'netCDF';
-% cd(search_path)
+search_path = 'C:\Users\cawynn\OneDrive - University of Tasmania\Documents\GitHub\saz-data-processing\netCDF';
+cd(search_path)
     
 % 	files{1} = 'IMOS_DWM-SOTS_CPST_20200829_SAZ47_FV01_SAZ47-22-2020-SBE37-SM-3124-2000m_END-20210426_C-20220120.nc';
 %     files{2} = 'IMOS_DWM-SOTS_PT_20200815_SAZ47_FV01_SAZ47-22-2020-TDR-2050-016370-3800m_END-20210517_C-20220120.nc';
 %     files{3} = 'IMOS_DWM-SOTS_AEPV_20200815_SAZ47_FV00_SAZ47-22-2020-Aquadopp-2-MHz-AQD-9820-1200m_END-20210428_C-20210513.nc';
 
     
-    files{1} = 'netCDF\IMOS_DWM-SOTS_CPST_20220317_SAZ47_FV01_SAZ47-24-2022-SBE37-SM-1777-1000m_END-20220824_C-20230802.nc';
-    files{2} = 'netCDF\IMOS_DWM-SOTS_PT_20220501_SAZ47_FV01_SAZ47-24-2022-TDR-2050-016370-2000m_END-20230521_C-20230802.nc';
-    files{3} = 'netCDF\IMOS_DWM-SOTS_CPST_20220317_SAZ47_FV01_SAZ47-24-2022-SBE37-SM-2955-3800m_END-20220914_C-20230802.nc';
-    files{4} = 'netCDF\IMOS_DWM-SOTS_AEPV_20220501_SAZ47_FV00_SAZ47-24-2022-Aquadopp-2-MHz-AQD-9882-1215m_END-20230530_C-20230727.nc';
+    files{1} = 'IMOS_DWM-SOTS_CPST_20210401_SAZ47_FV01_SAZ47-23-2021-SBE37-SM-4906-1000m_END-20220513_C-20220527.nc';
+    files{2} = 'IMOS_DWM-SOTS_PT_20210416_SAZ47_FV01_SAZ47-23-2021-TDR-2050-016371-2000m_END-20220401_C-20220530.nc';
+    files{3} = 'IMOS_DWM-SOTS_CPST_20210401_SAZ47_FV01_SAZ47-23-2021-SBE37-SM-4907-3800m_END-20220513_C-20220527.nc';
+    files{4} = 'IMOS_DWM-SOTS_AEPV_20220501_SAZ47_FV00_SAZ47-24-2022-Aquadopp-2-MHz-AQD-9882-1215m_END-20230530_C-20230727.nc';
 
 dep_start = ncreadatt(files{1}, '/', 'time_deployment_start');
 dep_end = ncreadatt(files{1}, '/', 'time_deployment_end');
@@ -56,10 +56,10 @@ end
 depl = ncreadatt(files{1},'/','deployment_code');
 
 fig = figure(1);
-figurename = ['figures\' depl '_pressure'];
+figurename = [depl '_pressure'];
 
-%figure_path = 'figures';
-% cd(figure_path)
+figure_path = 'C:\Users\cawynn\OneDrive - University of Tasmania\Documents\GitHub\saz-data-processing\figures';
+cd(figure_path)
 
 print(figurename, '-dpng');
 
