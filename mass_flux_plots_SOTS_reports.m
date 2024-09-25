@@ -1,7 +1,7 @@
 %%%% Plot mass flux sediment trap data for quick look plots,
 %%%% including all data, with their associated flags
 
-files = dir('raw_data/IMOS_DWM*SAZ47-23*PARFLUX*.nc');
+files = dir('IMOS*PARFLUX*.nc');
 
 close all;
 
@@ -43,7 +43,7 @@ for k = 1:length(files)
 
         Q3 = plot(time(varQC == 3), var(varQC == 3),'d','MarkerSize',6,'MarkerFaceColor', cl(k,:), 'Color', cl(k, :));
 
-        Q4 = plot(time(varQC == 4), var(varQC == 4),'s','MarkerSize', 6, 'MarkerFaceColor', cl(k,:), 'Color', cl(k, :))
+        Q4 = plot(time(varQC == 4), var(varQC == 4),'s','MarkerSize', 6, 'MarkerFaceColor', cl(k,:), 'Color', cl(k, :));
         
         pn = pn + 1;
     catch
@@ -58,6 +58,8 @@ set(get(get(Q2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
 h= legend(p,'Orientation','horizontal','Location', 'southoutside');
 set(h, 'FontSize', 10)
 xlim([timestart-10 timeend+10]);
+set = gca;
+set.FontSize = 12;
 hold off
 
 print( fig, '-dpng', [files(1).folder '/' deployment_code '-report_plot.png'])

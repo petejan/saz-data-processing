@@ -1,6 +1,6 @@
 % illustrating SAZ data month by month
 
-path = 'C:\Users\cawynn\OneDrive - University of Tasmania\Documents\GitHub\saz-data-processing\netCDF\trap data';
+path = 'C:\Users\wyn028\OneDrive - CSIRO\Documents\GitHub\saz-data-processing';
 cd(path)
 %files = dir('IMOS*PARFLUX*2000m*nc');
 files = dir('IMOS*PARFLUX*nc');
