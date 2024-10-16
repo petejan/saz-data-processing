@@ -29,7 +29,7 @@ clear data_files
 %data_files{1}  = 'raw_data/2016_saz18_47_sed.xlsx';
 %=======
 %data_files{1} ='raw_data/2016_saz18_47_sed_CWE_ver8.xlsx';
-data_files{1} = '2022_saz24_47_sed_CWE_QC.xlsx';
+data_files{1} = 'raw_data/2022_saz24_47_sed_CWE_QC.xlsx';
 %data_files{1} ='C:\Users\wyn028\OneDrive - University of Tasmania\sediment trap lab proc\2022_saz24\2022_saz24_47_sed_CWE_QC.xlsx';
 
 
