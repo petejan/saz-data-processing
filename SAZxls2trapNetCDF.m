@@ -159,6 +159,13 @@ function gen_trap_netcdf(data_file)
                
         glob_all = [glob_all; cell2table({deployment, 'comment_generating_script', 'STRING', mfilename}, 'VariableNames', var_names)];
 
+
+        %%%% add in sample specific comments
+
+        comment_sample = string(data.sample(strcmp(data.metadata, 'comment_sample') & data.metadata_depth == d_u(didx)));
+
+        glob_all = [glob_all; cell2table({deployment, 'comment_sample', 'STRING', comment_sample}, 'VariableNames', var_names)];
+
         % build the file name
         % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
         
