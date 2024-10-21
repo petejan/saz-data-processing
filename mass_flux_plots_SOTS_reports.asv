@@ -45,9 +45,10 @@ for k = 1:length(files)
 
         if ~isempty(time(varQC <= 2))
             p(pn) = plot(time(varQC <= 2), var(varQC <= 2),'.-','MarkerSize',5,'LineWidth',0.9,'DisplayName',num2str(nominal_depth), 'Color', cl(k,:));
-        else
-            p(pn) = plot(time, var,'.','MarkerSize',5,'LineWidth',0.9,'DisplayName',num2str(nominal_depth), 'Color', cl(k,:));
         end
+        legend_names{pn} = num2str(nominal_depth);
+        legend_colours(pn,:) = cl(k,:);
+
         
 
         % plot the QC info
@@ -67,15 +68,19 @@ grid on
 ylabel([var_name ' (' var_unit ')'], 'Interpreter', 'none')
 %t = title(['QC flag 1 = \cdot-, {\color[rgb]{', num2str(qc_color(2,:)), '}QC flag 2 = blue dots, \color[rgb]{', num2str(qc_color(3,:)), '}QC flag 3 = magenta \diamondsuit, \color[rgb]{', num2str(qc_color(4,:)), '}QC flag 4 = red \wedge}'],'Interpreter','tex');
 t = title({deployment_code ;'\rmQC flag 1 = line, QC flag 2 = circle, QC flag 3 = diamond, QC flag 4 = square'},'Interpreter','tex');
-% set(get(get(Q2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-% set(get(get(Q3,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-% set(get(get(Q4,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+if ~isempty(Q2)
+    set(get(get(Q2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    set(get(get(Q2,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
 
-[a,bb,icons,c]= legend(p,'Orientation','horizontal','Location', 'southoutside','FontSize', 12);
-icons(1).MarkerSize = 12;
-icons(2).MarkerSize = 12;
-icons(3).MarkerSize = 12;
+elseif ~isempty(Q3)
+    set(get(get(Q3,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+else
+    set(get(get(Q4,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+end
+%h= legend(p,'Orientation','horizontal','Location', 'southoutside');
+h= legend('Orientation','horizontal','Location', 'southoutside');
 
+set(h, 'FontSize', 10)
 xlim([timestart-10 timeend+10]);
 set = gca;
 set.FontSize = 12;
