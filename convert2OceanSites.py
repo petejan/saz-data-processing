@@ -202,7 +202,7 @@ for fn in nc_files:
                                 "[year-of-data-download], [Title], [Data access URL], accessed [date-of-access].\"")
     ncOut.setncattr("Conventions", "CF-1.6 OceanSITES-1.3 NCADD-1.2.1")
     ncOut.setncattr("license", "Follows CLIVAR (Climate Variability and Predictability) standards,cf. http://www.clivar.org/data/data_policy.php Data available free of charge. User assumes all risk for use of  data. User must display citation in any publication or product using data. User must contact PI prior to any commercial use of data.")
-    ncOut.setncattr("contributor_name", "CSIRO; IMOS; ACE-CRC; MNF; AAPP")
+    ncOut.setncattr("contributor_name", "CSIRO; IMOS; MNF; AAPP")
     ncOut.setncattr("processing_level", "data manually reviewed")
     ncOut.setncattr("QC_indicator", "excellent")
     ncOut.setncattr("instrument", instrumentName + "-" + serialNumber)
