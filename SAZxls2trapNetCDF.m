@@ -21,14 +21,12 @@ clear data_files
 %data_files{14}  = 'raw_data/2016_saz18_47_sed.xlsx';
 %data_files{15}  = 'raw_data/2017_saz19_46_sed.xlsx';
 %data_files{16}  = 'raw_data/2018_saz20_47_sed.xlsx';
-%data_files{17}  ='raw_data/2019_saz21_47_sed.xlsx';
-% data_files{1}  ='raw_data/2013_saz16_47_sed_CWE_ver7.xls';
-% data_file  ='raw_data/2015_saz17_47_sed_CWE_2019_ver7.xls';
-%<<<<<<< Updated upstream
-%data_files{1} ='raw_data/2021_saz23_47_sed_ver1.xlsx';
-%data_files{1}  = 'raw_data/2016_saz18_47_sed.xlsx';
-%=======
-%data_files{1} ='raw_data/2016_saz18_47_sed_CWE_ver8.xlsx';
+%data_files{17}  = 'raw_data/2019_saz21_47_sed.xlsx';
+%data_files{1}   = 'raw_data/2013_saz16_47_sed_CWE_ver7.xls';
+%data_files{1}   = 'raw_data/2015_saz17_47_sed_CWE_2019_ver7.xls';
+%data_files{1}   = 'raw_data/2021_saz23_47_sed_ver1.xlsx';
+%data_files{1}   = 'raw_data/2016_saz18_47_sed.xlsx';
+%data_files{1}   = 'raw_data/2016_saz18_47_sed_CWE_ver8.xlsx';
 data_files{1} = 'raw_data/2022_saz24_47_sed_CWE_QC.xlsx';
 %data_files{1} ='C:\Users\wyn028\OneDrive - University of Tasmania\sediment trap lab proc\2022_saz24\2022_saz24_47_sed_CWE_QC.xlsx';
 
@@ -188,9 +186,11 @@ function gen_trap_netcdf(data_file)
             elseif strcmp(glob_all.deployment{i}, deployment)
                 add_this = true;
             end
-            %if strcmp(glob_all.type{i}, 'STRING')
+            if strcmp(glob_all.type{i}, 'STRING')
                 netcdf.putAtt(ncid, glob_att, glob_all.name{i}, glob_all.value{i});
-            %end
+            elseif strcmp(glob_all.type{i}, 'DOUBLE')
+                netcdf.putAtt(ncid, glob_att, glob_all.name{i}, str2double(glob_all.value{i}));
+            end
         end
 
         % add the TIME dimension
