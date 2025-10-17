@@ -191,7 +191,11 @@ function gen_trap_netcdf(data_file)
             if strcmp(glob_all.type{i}, 'STRING')
                 netcdf.putAtt(ncid, glob_att, glob_all.name{i}, glob_all.value{i});
             elseif strcmp(glob_all.type{i}, 'DOUBLE')
-                netcdf.putAtt(ncid, glob_att, glob_all.name{i}, str2double(glob_all.value{i}));
+                if (ischar(class(glob_all.value{i})) == 0)
+                    netcdf.putAtt(ncid, glob_att, glob_all.name{i}, str2double(glob_all.value{i}));
+                else
+                    netcdf.putAtt(ncid, glob_att, glob_all.name{i}, glob_all.value{i});
+                end
             end
         end
 
