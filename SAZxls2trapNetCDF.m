@@ -63,7 +63,7 @@ function gen_trap_netcdf(data_file)
     this_deployment = deployment_data(dep_info_idx,:);
 
     % get some netcdf helpers
-%    cmode = netcdf.getConstant('NETCDF4');
+    cmode = netcdf.getConstant('NETCDF4');
     cmode = bitor(cmode, netcdf.getConstant('CLASSIC_MODEL'));
 
 
@@ -160,10 +160,11 @@ function gen_trap_netcdf(data_file)
 
 
         %%%% add in sample specific comments
-
-        comment_sample = string(data.sample(strcmp(data.metadata, 'comment_sample') & data.metadata_depth == d_u(didx)));
-
-        glob_all = [glob_all; cell2table({deployment, 'comment_sample', 'STRING', comment_sample}, 'VariableNames', var_names)];
+        if (data.metadata_depth == d_u(didx))
+            comment_sample = string(data.sample(strcmp(data.metadata, 'comment_sample')));
+    
+            glob_all = [glob_all; cell2table({deployment, 'comment_sample', 'STRING', comment_sample}, 'VariableNames', var_names)];
+        end
 
         % build the file name
         % example IMOS_DWM-SOTS_KF_20150410_SAZ47_FV01_SAZ47-17-2015-PARFLUX-Mark78H-21-11741-01-2000m_END-20160312_C-20171110.nc
