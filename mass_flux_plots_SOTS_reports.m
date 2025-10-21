@@ -6,7 +6,8 @@ clear all;
 
 %files = dir('IMOS*PARFLUX*.nc');
 
-files = dir('raw_data\IMOS*PARFLUX*.nc');
+% files = dir('raw_data\IMOS*PARFLUX*.nc');
+files = dir('netCDF\IMOS*2023*PARFLUX*.nc');
 
 
 fig = figure(1);
