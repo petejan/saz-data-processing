@@ -81,5 +81,7 @@ xlim([timestart-10 timeend+10]);
 set = gca;
 set.FontSize = 12;
 hold off
+t=gcf;
 
 print( fig, '-dpng', [files(1).folder '/' deployment_code '-report_plot.png'])
+exportgraphics(t, [files(1).folder '/' deployment_code '-report_plot.png'])

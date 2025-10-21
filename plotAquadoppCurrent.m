@@ -3,7 +3,7 @@
 %file = 'data/IMOS_ABOS-ASFS_EVZ_20150322T001500Z_SOFS_FV01_SOFS-5-2015-Sea-Guard-200_END-20160420T041501Z_C-20161023T042146Z.nc';
 %file = 'data/IMOS_ABOS-ASFS_EVZ_20150322T001500Z_SOFS_FV01_SOFS-5-2015-Sea-Guard-800_END-20160420T040000Z_C-20161023T042334Z.nc';
 
-file = 'netCDF/IMOS_DWM-SOTS_AEPV_20220501_SAZ47_FV00_SAZ47-24-2022-Aquadopp-2-MHz-AQD-9882-1215m_END-20230530_C-20230727.nc';
+file = 'netCDF/IMOS_DWM-SOTS_AETVZ_20230518_SAZ47_FV01_SAZ47-25-2023-Aquadopp-Current-Meter-1200_END-20240410_C-20240702.nc';
 
 %file = 'IMOS_DWM-SOTS_AETVZ_20180303_SAZ47_FV01_SAZ47-20-2018-Aquadopp-Current-Meter-AQD-5961-1200m_END-20190322_C-20190719.nc';
 
@@ -13,12 +13,20 @@ inst = ncreadatt(file, '/', 'instrument');
 
 TIME = ncread(file, 'TIME') + datenum(1950,1,1);
 
-VCUR = ncread(file, 'VCUR_MAG');
-%qc_v = ncreadatt(file, 'VCUR_MAG', 'ancillary_variables');
-%VCUR_qc = ncread(file, qc_v);
-UCUR = ncread(file, 'UCUR_MAG');
-%qc_u = ncreadatt(file, 'UCUR_MAG', 'ancillary_variables');
-%UCUR_qc = ncread(file, qc_u);
+%VCUR = ncread(file, 'VCUR_MAG');
+VCUR = ncread(file, 'VCUR');
+qc_v = ncreadatt(file, 'VCUR', 'ancillary_variables');
+VCUR_qc = ncread(file, qc_v);
+% VCUR_msk = VCUR_qc<2;
+% VCUR(VCUR_msk >2) = NaN; 
+
+%UCUR = ncread(file, 'UCUR_MAG');
+UCUR = ncread(file, 'UCUR');
+qc_u = ncreadatt(file, 'UCUR', 'ancillary_variables');
+UCUR_qc = ncread(file, qc_u);
+% UCUR_msk = UCUR_qc<2;
+% UCUR(UCUR_msk >2) = NaN; 
+
 
 roll = ncread(file, 'ROLL');
 pitch = ncread(file, 'PITCH');
@@ -41,13 +49,11 @@ grid on; title(sprintf('%s @ %4.0f m : 90 current %4.3f m/s',  ttl, dpt, current
 ylabel('cumulative probability'); xlabel('current (m/s)');
 
 figure(4)
-
 edg_tilt = 0:0.2:20;
 %Ntilt = histcounts(tilt(VCUR_MAG_qc<=1), edg_tilt, 'Normalization', 'pdf');
 % FV00 file
 %Ntilt = histcounts(tilt(VCUR_qc<=1), edg_tilt, 'Normalization', 'probability');
 Ntilt = histcounts(tilt, edg_tilt, 'Normalization', 'probability');
-
 
 plot(edg_tilt(1:end-1), Ntilt);
 ylabel('probability'); xlabel('tilt (deg)');
